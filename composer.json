@@ -1,0 +1,66 @@
+{
+  "name": "offload-project/laravel-hoist",
+  "description": "Feature discovery and util extension for Laravel Pennant",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "laravel",
+    "pennant",
+    "feature-flags",
+    "feature-discovery",
+    "feature-management"
+  ],
+  "authors": [
+    {
+      "name": "Offload Project"
+    }
+  ],
+  "require": {
+    "php": "^8.3",
+    "illuminate/support": "^11.0|^12.0"
+  },
+  "require-dev": {
+    "larastan/larastan": "^3.8.1",
+    "laravel/pennant": "^1.0",
+    "laravel/pint": "^1.26.0",
+    "orchestra/testbench": "^9.15|^10.8",
+    "pestphp/pest": "^3.0|^4.0",
+    "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+    "spatie/laravel-data": "^4.18"
+  },
+  "autoload": {
+    "psr-4": {
+      "OffloadProject\\Hoist\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "OffloadProject\\Hoist\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "OffloadProject\\Hoist\\HoistServiceProvider"
+      ],
+      "aliases": {
+        "Hoist": "OffloadProject\\Hoist\\Facades\\Hoist"
+      }
+    }
+  },
+  "scripts": {
+    "test": "pest",
+    "test-coverage": "pest --coverage",
+    "analyse": "phpstan analyse --memory-limit=-1",
+    "analyse-baseline": "phpstan analyse --memory-limit=-1 --generate-baseline",
+    "pint": "vendor/bin/pint"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    },
+    "sort-packages": true
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

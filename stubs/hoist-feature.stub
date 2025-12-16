@@ -1,0 +1,46 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use OffloadProject\Hoist\Contracts\Feature;
+
+class {{ class }} implements Feature
+{
+    /**
+     * The feature name.
+     */
+    public string $name = '{{ kebab }}';
+
+    /**
+     * The feature label.
+     */
+    public string $label = '{{ label }}';
+
+    /**
+     * The feature description.
+     */
+    public ?string $description = null;
+
+    /**
+     * The route to the feature (optional).
+     */
+    public ?string $route = null;
+
+    /**
+     * Return any feature metadata.
+     */
+    public function metadata(): array
+    {
+        return [];
+    }
+
+    /**
+     * Resolve the feature's initial value.
+     */
+    public function resolve(mixed $scope): mixed
+    {
+        return false;
+    }
+}
