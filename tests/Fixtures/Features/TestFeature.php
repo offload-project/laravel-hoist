@@ -12,6 +12,8 @@ final class TestFeature
 
     public string $description = 'A test feature';
 
+    public array $tags = ['flag', 'testing'];
+
     public function resolve($user): bool
     {
         return true;

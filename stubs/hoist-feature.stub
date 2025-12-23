@@ -29,6 +29,11 @@ class {{ class }} implements Feature
     public ?string $route = null;
 
     /**
+     * The feature tags for categorization.
+     */
+    public array $tags = [];
+
+    /**
      * Return any feature metadata.
      */
     public function metadata(): array
