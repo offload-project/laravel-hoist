@@ -146,3 +146,46 @@ test('it returns null href when route property is missing', function () {
 
     expect($data->href)->toBeNull();
 });
+
+test('it includes tags from feature class', function () {
+    $feature = new class
+    {
+        public string $name = 'test';
+
+        public string $label = 'Test';
+
+        public array $tags = ['subscription', 'pro'];
+    };
+
+    $data = FeatureData::fromClass($feature);
+
+    expect($data->tags)->toBe(['subscription', 'pro']);
+});
+
+test('it returns empty tags array when tags property is missing', function () {
+    $feature = new class
+    {
+        public string $name = 'test';
+
+        public string $label = 'Test';
+    };
+
+    $data = FeatureData::fromClass($feature);
+
+    expect($data->tags)->toBe([]);
+});
+
+test('it handles empty tags array', function () {
+    $feature = new class
+    {
+        public string $name = 'test';
+
+        public string $label = 'Test';
+
+        public array $tags = [];
+    };
+
+    $data = FeatureData::fromClass($feature);
+
+    expect($data->tags)->toBe([]);
+});

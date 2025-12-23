@@ -79,6 +79,7 @@ class BillingFeature implements Feature
     public string $label = 'Billing Module';
     public ?string $description = 'Advanced billing features';
     public ?string $route = 'billing.index'; // Optional route name
+    public array $tags = ['subscription', 'pro']; // Feature tags
 
     public function resolve(mixed $scope): mixed
     {
@@ -121,6 +122,7 @@ foreach ($userFeatures as $feature) {
     echo $feature->href;        // route('billing.index')
     echo $feature->active;      // true/false
     print_r($feature->metadata); // ['category' => 'premium', ...]
+    print_r($feature->tags);     // ['subscription', 'pro']
 }
 ```
 
@@ -167,6 +169,59 @@ $names = Hoist::names();
 // Returns: ['feature-one', 'feature-two', ...]
 ```
 
+### Feature Tags
+
+Tags provide a flexible way to categorize features for filtering. Use tags to separate feature flags from subscription features, or to group features by plan tier.
+
+#### Define Tags
+
+```php
+class DarkMode implements Feature
+{
+    public string $name = 'dark-mode';
+    public string $label = 'Dark Mode';
+    public array $tags = ['flag', 'ui'];
+    // ...
+}
+
+class AdvancedReporting implements Feature
+{
+    public string $name = 'advanced-reporting';
+    public string $label = 'Advanced Reporting';
+    public array $tags = ['subscription', 'pro', 'enterprise'];
+    // ...
+}
+```
+
+#### Filter by Tags
+
+```php
+// Get features with a specific tag
+$flags = Hoist::tagged('flag');
+$subscriptionFeatures = Hoist::tagged('subscription');
+
+// Get features with ALL specified tags (AND logic)
+$proSubscriptions = Hoist::withTags(['subscription', 'pro']);
+
+// Get features with ANY of the specified tags (OR logic)
+$paidFeatures = Hoist::withAnyTags(['pro', 'enterprise']);
+```
+
+#### Filter with Model Scope
+
+Include active status when filtering by tags:
+
+```php
+// Get subscription features for a user with active status
+$features = Hoist::taggedFor('subscription', $user);
+
+// Get pro features for a user
+$proFeatures = Hoist::withTagsFor(['subscription', 'pro'], $user);
+
+// Get any paid tier features for a user
+$paidFeatures = Hoist::withAnyTagsFor(['pro', 'enterprise'], $user);
+```
+
 ### Feature Data Structure
 
 The `FeatureData` class provides a structured way to access feature information:
@@ -180,6 +235,7 @@ class FeatureData
     public ?string $href;       // Generated route URL
     public ?bool $active;       // Active status (when using forModel)
     public array $metadata;     // Custom metadata
+    public array $tags;         // Feature tags for categorization
 }
 ```
 
@@ -277,7 +333,8 @@ Returns:
     "metadata": {
       "category": "premium",
       "icon": "credit-card"
-    }
+    },
+    "tags": ["subscription", "pro"]
   }
 ]
 ```
@@ -366,6 +423,7 @@ class MyFeature implements Feature
     public string $label = 'My Feature';
     public ?string $description = null;
     public ?string $route = null;
+    public array $tags = [];
 
     public function resolve(mixed $scope): mixed
     {

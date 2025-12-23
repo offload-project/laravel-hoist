@@ -76,6 +76,86 @@ final class FeatureDiscovery
     }
 
     /**
+     * Get features with a specific tag.
+     */
+    public function tagged(string $tag): Collection
+    {
+        return $this->all()->filter(fn (FeatureData $feature) => in_array($tag, $feature->tags, true));
+    }
+
+    /**
+     * Get features with ALL specified tags (AND logic).
+     */
+    public function withTags(array $tags): Collection
+    {
+        return $this->all()->filter(function (FeatureData $feature) use ($tags) {
+            foreach ($tags as $tag) {
+                if (! in_array($tag, $feature->tags, true)) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    }
+
+    /**
+     * Get features with ANY of the specified tags (OR logic).
+     */
+    public function withAnyTags(array $tags): Collection
+    {
+        return $this->all()->filter(function (FeatureData $feature) use ($tags) {
+            foreach ($tags as $tag) {
+                if (in_array($tag, $feature->tags, true)) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+    }
+
+    /**
+     * Get features with a specific tag for a model (includes active status).
+     */
+    public function taggedFor(string $tag, mixed $model): Collection
+    {
+        return $this->forModel($model)->filter(fn (FeatureData $feature) => in_array($tag, $feature->tags, true));
+    }
+
+    /**
+     * Get features with ALL specified tags for a model (includes active status).
+     */
+    public function withTagsFor(array $tags, mixed $model): Collection
+    {
+        return $this->forModel($model)->filter(function (FeatureData $feature) use ($tags) {
+            foreach ($tags as $tag) {
+                if (! in_array($tag, $feature->tags, true)) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    }
+
+    /**
+     * Get features with ANY of the specified tags for a model (includes active status).
+     */
+    public function withAnyTagsFor(array $tags, mixed $model): Collection
+    {
+        return $this->forModel($model)->filter(function (FeatureData $feature) use ($tags) {
+            foreach ($tags as $tag) {
+                if (in_array($tag, $feature->tags, true)) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+    }
+
+    /**
      * Get the feature name from a feature instance.
      */
     private function getFeatureName(object $feature): string

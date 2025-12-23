@@ -16,6 +16,8 @@ final class InterfaceFeature implements Feature
 
     public ?string $route = null;
 
+    public array $tags = ['subscription', 'enterprise'];
+
     public function resolve(mixed $scope): mixed
     {
         return true;

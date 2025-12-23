@@ -16,6 +16,7 @@ final class FeatureData extends Data
         public ?string $href,
         public ?bool $active = null,
         public array $metadata = [],
+        public array $tags = [],
     ) {}
 
     public static function fromClass(object $feature, ?bool $active = null): self
@@ -29,6 +30,7 @@ final class FeatureData extends Data
             href: $route && Route::has($route) ? route($route) : null,
             active: $active,
             metadata: method_exists($feature, 'metadata') ? $feature->metadata() : [],
+            tags: $feature->tags ?? [],
         );
     }
 }
