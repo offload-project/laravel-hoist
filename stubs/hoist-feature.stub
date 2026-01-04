@@ -4,46 +4,27 @@ declare(strict_types=1);
 
 namespace {{ namespace }};
 
+use OffloadProject\Hoist\Attributes\Description;
+use OffloadProject\Hoist\Attributes\FeatureSet;
+use OffloadProject\Hoist\Attributes\Label;
+use OffloadProject\Hoist\Attributes\Route;
+use OffloadProject\Hoist\Attributes\Tags;
 use OffloadProject\Hoist\Contracts\Feature;
 
+#[Label('{{ label }}')]
+#[Description('')]
+// #[Route('')]
+// #[Tags('')]
+// #[FeatureSet('')]
 class {{ class }} implements Feature
 {
-    /**
-     * The feature name.
-     */
     public string $name = '{{ kebab }}';
 
-    /**
-     * The feature label.
-     */
-    public string $label = '{{ label }}';
-
-    /**
-     * The feature description.
-     */
-    public ?string $description = null;
-
-    /**
-     * The route to the feature (optional).
-     */
-    public ?string $route = null;
-
-    /**
-     * The feature tags for categorization.
-     */
-    public array $tags = [];
-
-    /**
-     * Return any feature metadata.
-     */
     public function metadata(): array
     {
         return [];
     }
 
-    /**
-     * Resolve the feature's initial value.
-     */
     public function resolve(mixed $scope): mixed
     {
         return false;
