@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Route;
 use OffloadProject\Hoist\Data\FeatureData;
+use OffloadProject\Hoist\Tests\Fixtures\Features\AttributeFeature;
+use OffloadProject\Hoist\Tests\Fixtures\Features\MixedFeature;
 
 test('it creates feature data from class with all properties', function () {
     $feature = new class
@@ -188,4 +189,75 @@ test('it handles empty tags array', function () {
     $data = FeatureData::fromClass($feature);
 
     expect($data->tags)->toBe([]);
+});
+
+test('it reads label from attribute', function () {
+    $feature = new AttributeFeature;
+
+    $data = FeatureData::fromClass($feature);
+
+    expect($data->label)->toBe('Attribute Feature Label');
+});
+
+test('it reads description from attribute', function () {
+    $feature = new AttributeFeature;
+
+    $data = FeatureData::fromClass($feature);
+
+    expect($data->description)->toBe('A feature using attributes');
+});
+
+test('it reads tags from attribute', function () {
+    $feature = new AttributeFeature;
+
+    $data = FeatureData::fromClass($feature);
+
+    expect($data->tags)->toBe(['premium', 'beta']);
+});
+
+test('it reads featureSet from attribute', function () {
+    $feature = new AttributeFeature;
+
+    $data = FeatureData::fromClass($feature);
+
+    expect($data->featureSet)->toBe('billing');
+});
+
+test('it returns null featureSet when not defined', function () {
+    $feature = new class
+    {
+        public string $name = 'test';
+
+        public string $label = 'Test';
+    };
+
+    $data = FeatureData::fromClass($feature);
+
+    expect($data->featureSet)->toBeNull();
+});
+
+test('it reads featureSet from property as fallback', function () {
+    $feature = new class
+    {
+        public string $name = 'test';
+
+        public string $label = 'Test';
+
+        public string $featureSet = 'admin';
+    };
+
+    $data = FeatureData::fromClass($feature);
+
+    expect($data->featureSet)->toBe('admin');
+});
+
+test('attributes take precedence over properties', function () {
+    $feature = new MixedFeature;
+
+    $data = FeatureData::fromClass($feature);
+
+    expect($data->label)->toBe('Attribute Label')
+        ->and($data->description)->toBe('Attribute Description')
+        ->and($data->tags)->toBe(['attr-tag'])
+        ->and($data->featureSet)->toBe('attr-set');
 });

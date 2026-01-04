@@ -44,12 +44,23 @@ test('stub file has metadata method', function () {
     expect($content)->toContain('public function metadata(): array');
 });
 
-test('stub file has nullable properties with null defaults', function () {
+test('stub file has attribute imports', function () {
     $stubPath = __DIR__.'/../../stubs/hoist-feature.stub';
     $content = File::get($stubPath);
 
-    expect($content)->toContain('public ?string $description = null;')
-        ->and($content)->toContain('public ?string $route = null;');
+    expect($content)->toContain('use OffloadProject\\Hoist\\Attributes\\Label;')
+        ->and($content)->toContain('use OffloadProject\\Hoist\\Attributes\\Description;')
+        ->and($content)->toContain('use OffloadProject\\Hoist\\Attributes\\Route;')
+        ->and($content)->toContain('use OffloadProject\\Hoist\\Attributes\\Tags;')
+        ->and($content)->toContain('use OffloadProject\\Hoist\\Attributes\\FeatureSet;');
+});
+
+test('stub file uses attributes for metadata', function () {
+    $stubPath = __DIR__.'/../../stubs/hoist-feature.stub';
+    $content = File::get($stubPath);
+
+    expect($content)->toContain("#[Label('{{ label }}')]")
+        ->and($content)->toContain("#[Description('')]");
 });
 
 test('command class has correct name', function () {
