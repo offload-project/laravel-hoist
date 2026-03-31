@@ -64,6 +64,9 @@ This will create a new feature class in your configured feature directory (defau
 
 #### Feature Class Example
 
+Features can define metadata using **PHP attributes** (recommended) or **class properties**. Attributes take precedence
+over properties when both are present.
+
 ```php
 <?php
 
@@ -71,15 +74,21 @@ declare(strict_types=1);
 
 namespace App\Features;
 
+use OffloadProject\Hoist\Attributes\Description;
+use OffloadProject\Hoist\Attributes\FeatureSet;
+use OffloadProject\Hoist\Attributes\Label;
+use OffloadProject\Hoist\Attributes\Route;
+use OffloadProject\Hoist\Attributes\Tags;
 use OffloadProject\Hoist\Contracts\Feature;
 
+#[Label('Billing Module')]
+#[Description('Advanced billing features')]
+#[Route('billing.index')]
+#[Tags('subscription', 'pro')]
+#[FeatureSet('premium')]
 class BillingFeature implements Feature
 {
     public string $name = 'billing';
-    public string $label = 'Billing Module';
-    public ?string $description = 'Advanced billing features';
-    public ?string $route = 'billing.index'; // Optional route name
-    public array $tags = ['subscription', 'pro']; // Feature tags
 
     public function resolve(mixed $scope): mixed
     {
@@ -99,6 +108,40 @@ class BillingFeature implements Feature
 
 > **Note:** The `Feature` interface is optional but recommended. Features are discovered based on having a `resolve()`
 > method, but implementing the interface provides better IDE support and type safety.
+
+### Attributes
+
+PHP attributes provide a clean, declarative way to define feature metadata directly on the class. All attributes are
+optional and target the class level.
+
+| Attribute | Parameter | Description |
+|---|---|---|
+| `#[Label('...')]` | `string $value` | Human-readable display name |
+| `#[Description('...')]` | `string $value` | Feature description |
+| `#[Route('...')]` | `string $value` | Named route for generating the feature's `href` |
+| `#[Tags('...')]` | `string ...$tags` | One or more tags for categorization |
+| `#[FeatureSet('...')]` | `string $name, ?string $label` | Group features into a named set |
+
+When an attribute is present, it takes precedence over the equivalent class property. You can mix both approaches — for
+example, use attributes for static metadata and properties for values that need to be computed.
+
+```php
+// Properties-only approach (still supported)
+class MyFeature implements Feature
+{
+    public string $name = 'my-feature';
+    public string $label = 'My Feature';
+    public ?string $description = 'A description';
+    public ?string $route = 'my-feature.index';
+    public array $tags = ['flag'];
+    public string $featureSet = 'core';
+
+    public function resolve(mixed $scope): mixed
+    {
+        return true;
+    }
+}
+```
 
 #### Using Features
 
@@ -178,19 +221,22 @@ features, or to group features by plan tier.
 #### Define Tags
 
 ```php
+use OffloadProject\Hoist\Attributes\Label;
+use OffloadProject\Hoist\Attributes\Tags;
+
+#[Label('Dark Mode')]
+#[Tags('flag', 'ui')]
 class DarkMode implements Feature
 {
     public string $name = 'dark-mode';
-    public string $label = 'Dark Mode';
-    public array $tags = ['flag', 'ui'];
     // ...
 }
 
+#[Label('Advanced Reporting')]
+#[Tags('subscription', 'pro', 'enterprise')]
 class AdvancedReporting implements Feature
 {
     public string $name = 'advanced-reporting';
-    public string $label = 'Advanced Reporting';
-    public array $tags = ['subscription', 'pro', 'enterprise'];
     // ...
 }
 ```
@@ -231,13 +277,14 @@ The `FeatureData` class provides a structured way to access feature information:
 ```php
 class FeatureData
 {
-    public string $name;        // Feature identifier
-    public string $label;       // Human-readable name
+    public string $name;         // Feature identifier
+    public string $label;        // Human-readable name
     public ?string $description; // Feature description
-    public ?string $href;       // Generated route URL
-    public ?bool $active;       // Active status (when using forModel)
-    public array $metadata;     // Custom metadata
-    public array $tags;         // Feature tags for categorization
+    public ?string $href;        // Generated route URL
+    public ?bool $active;        // Active status (when using forModel)
+    public array $metadata;      // Custom metadata
+    public array $tags;          // Feature tags for categorization
+    public ?string $featureSet;  // Feature set grouping
 }
 ```
 
@@ -246,10 +293,11 @@ class FeatureData
 This package extends Laravel Pennant by providing:
 
 1. **Automatic Discovery**: No need to manually register features
-2. **Rich Metadata**: Add custom metadata to features
-3. **Route Integration**: Link features to routes automatically
-4. **Structured Data**: Get features as structured data objects
-5. **Bulk Operations**: Get all features and their status in one call
+2. **PHP Attributes**: Declarative metadata using native PHP attributes
+3. **Rich Metadata**: Add custom metadata to features
+4. **Route Integration**: Link features to routes automatically
+5. **Structured Data**: Get features as structured data objects
+6. **Bulk Operations**: Get all features and their status in one call
 
 ### Using with Pennant's Native Features
 
@@ -339,7 +387,8 @@ Returns:
     "tags": [
       "subscription",
       "pro"
-    ]
+    ],
+    "featureSet": "premium"
   }
 ]
 ```
@@ -398,19 +447,20 @@ app/Features/
 
 ### Route Handling
 
-The `href` property in `FeatureData` is generated from the feature's `$route` property. The package safely handles
-routes:
+The `href` property in `FeatureData` is generated from the feature's route value (via the `#[Route]` attribute or
+`$route` property). The package safely handles routes:
 
-- If `$route` is `null` or empty, `href` will be `null`
-- If `$route` specifies a route name that doesn't exist, `href` will be `null` (no exception thrown)
-- If `$route` specifies a valid route name, `href` will contain the generated URL
+- If no route is defined, `href` will be `null`
+- If the route name doesn't exist, `href` will be `null` (no exception thrown)
+- If the route name is valid, `href` will contain the generated URL
 
 ```php
+use OffloadProject\Hoist\Attributes\Route;
+
+#[Route('dashboard.index')]
 class MyFeature implements Feature
 {
     public string $name = 'my-feature';
-    public string $label = 'My Feature';
-    public ?string $route = 'dashboard.index'; // Must be a valid route name
 
     // ...
 }
@@ -421,15 +471,15 @@ class MyFeature implements Feature
 The package provides an optional `Feature` interface for better type safety:
 
 ```php
+use OffloadProject\Hoist\Attributes\Description;
+use OffloadProject\Hoist\Attributes\Label;
 use OffloadProject\Hoist\Contracts\Feature;
 
+#[Label('My Feature')]
+#[Description('A description')]
 class MyFeature implements Feature
 {
     public string $name = 'my-feature';
-    public string $label = 'My Feature';
-    public ?string $description = null;
-    public ?string $route = null;
-    public array $tags = [];
 
     public function resolve(mixed $scope): mixed
     {
