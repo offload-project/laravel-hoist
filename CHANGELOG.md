@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/offload-project/laravel-hoist/compare/v1.1.0...v1.2.0) (2026-03-31)
+
+
+### Features
+
+* add support for laravel 13 ([#5](https://github.com/offload-project/laravel-hoist/issues/5)) ([522bf81](https://github.com/offload-project/laravel-hoist/commit/522bf81004f91bd465ed8ba1e2afed81299fa122))
+
 ## [1.1.0](https://github.com/offload-project/laravel-hoist/compare/v1.0.0...v1.1.0) (2025-12-23)
 
 
