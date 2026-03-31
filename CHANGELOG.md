@@ -1,5 +1,25 @@
 # Changelog
 
+## v1.3.0 - 2026-03-31
+
+### Added
+- Feature meta attrs [#9](https://github.com/offload-project/laravel-hoist/pull/9)
+
+### Changed
+- Add php 8.5 test [#8](https://github.com/offload-project/laravel-hoist/pull/8)
+- Fix doc paths in git attrs [#8](https://github.com/offload-project/laravel-hoist/pull/8)
+- Update git attrs [#7](https://github.com/offload-project/laravel-hoist/pull/7)
+- Add captainhook [#7](https://github.com/offload-project/laravel-hoist/pull/7)
+
+### Documentation
+- Update laravel versions [#7](https://github.com/offload-project/laravel-hoist/pull/7)
+
+### Other
+- Code style errs ([ea58786](https://github.com/offload-project/laravel-hoist/commit/ea58786704b3802212a569e1f386030171495cad))
+- Add merge_commit_sha to release [#8](https://github.com/offload-project/laravel-hoist/pull/8)
+- Use release champion [#7](https://github.com/offload-project/laravel-hoist/pull/7)
+- Drop dep automerge [#7](https://github.com/offload-project/laravel-hoist/pull/7)
+
 ## [1.2.0](https://github.com/offload-project/laravel-hoist/compare/v1.1.0...v1.2.0) (2026-03-31)
 
 
