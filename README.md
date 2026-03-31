@@ -12,7 +12,7 @@ with custom metadata and routing.
 ## Requirements
 
 - PHP 8.3+
-- Laravel 11+
+- Laravel 11/12/13
 - Laravel Pennant 1+
 
 ## Installation
@@ -97,7 +97,8 @@ class BillingFeature implements Feature
 }
 ```
 
-> **Note:** The `Feature` interface is optional but recommended. Features are discovered based on having a `resolve()` method, but implementing the interface provides better IDE support and type safety.
+> **Note:** The `Feature` interface is optional but recommended. Features are discovered based on having a `resolve()`
+> method, but implementing the interface provides better IDE support and type safety.
 
 #### Using Features
 
@@ -171,7 +172,8 @@ $names = Hoist::names();
 
 ### Feature Tags
 
-Tags provide a flexible way to categorize features for filtering. Use tags to separate feature flags from subscription features, or to group features by plan tier.
+Tags provide a flexible way to categorize features for filtering. Use tags to separate feature flags from subscription
+features, or to group features by plan tier.
 
 #### Define Tags
 
@@ -334,7 +336,10 @@ Returns:
       "category": "premium",
       "icon": "credit-card"
     },
-    "tags": ["subscription", "pro"]
+    "tags": [
+      "subscription",
+      "pro"
+    ]
   }
 ]
 ```
@@ -393,7 +398,8 @@ app/Features/
 
 ### Route Handling
 
-The `href` property in `FeatureData` is generated from the feature's `$route` property. The package safely handles routes:
+The `href` property in `FeatureData` is generated from the feature's `$route` property. The package safely handles
+routes:
 
 - If `$route` is `null` or empty, `href` will be `null`
 - If `$route` specifies a route name that doesn't exist, `href` will be `null` (no exception thrown)
@@ -438,6 +444,7 @@ class MyFeature implements Feature
 ```
 
 Features are discovered if they either:
+
 1. Implement the `Feature` interface, OR
 2. Have a `resolve()` method (for backward compatibility with plain Pennant features)
 
