@@ -20,12 +20,14 @@
     "illuminate/support": "^11.0|^12.0|^13.2"
   },
   "require-dev": {
+    "captainhook/captainhook-phar": "^5.29",
     "larastan/larastan": "^3.8.1",
     "laravel/pennant": "^1.0",
     "laravel/pint": "^1.26.0",
     "orchestra/testbench": "^9.15|^10.8|^11.0",
     "pestphp/pest": "^3.0|^4.0",
     "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+    "ramsey/conventional-commits": "^1.7",
     "spatie/laravel-data": "^4.18"
   },
   "autoload": {
@@ -57,6 +59,7 @@
   },
   "config": {
     "allow-plugins": {
+      "captainhook/captainhook-phar": true,
       "pestphp/pest-plugin": true
     },
     "sort-packages": true
