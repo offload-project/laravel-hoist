@@ -30,21 +30,26 @@ final class FeatureData extends Data
     {
         $reflection = new ReflectionClass($feature);
 
-        $label = self::getAttribute($reflection, Label::class)?->value
-            ?? (property_exists($feature, 'label') ? $feature->label : null)
+        $labelAttr = self::getAttribute($reflection, Label::class);
+        $label = $labelAttr !== null ? $labelAttr->value
+            : (property_exists($feature, 'label') ? $feature->label : null)
             ?? class_basename($feature::class);
 
-        $description = self::getAttribute($reflection, Description::class)?->value
-            ?? (property_exists($feature, 'description') ? $feature->description : null);
+        $descriptionAttr = self::getAttribute($reflection, Description::class);
+        $description = $descriptionAttr !== null ? $descriptionAttr->value
+            : (property_exists($feature, 'description') ? $feature->description : null);
 
-        $route = self::getAttribute($reflection, RouteAttribute::class)?->value
-            ?? (property_exists($feature, 'route') ? $feature->route : null);
+        $routeAttr = self::getAttribute($reflection, RouteAttribute::class);
+        $route = $routeAttr !== null ? $routeAttr->value
+            : (property_exists($feature, 'route') ? $feature->route : null);
 
-        $tags = self::getAttribute($reflection, Tags::class)?->value
-            ?? (property_exists($feature, 'tags') ? $feature->tags : []);
+        $tagsAttr = self::getAttribute($reflection, Tags::class);
+        $tags = $tagsAttr !== null ? $tagsAttr->value
+            : (property_exists($feature, 'tags') ? $feature->tags : []);
 
-        $featureSet = self::getAttribute($reflection, FeatureSet::class)?->name
-            ?? (property_exists($feature, 'featureSet') ? $feature->featureSet : null);
+        $featureSetAttr = self::getAttribute($reflection, FeatureSet::class);
+        $featureSet = $featureSetAttr !== null ? $featureSetAttr->name
+            : (property_exists($feature, 'featureSet') ? $feature->featureSet : null);
 
         return new self(
             name: property_exists($feature, 'name') ? $feature->name : class_basename($feature::class),
