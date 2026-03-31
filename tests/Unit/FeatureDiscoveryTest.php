@@ -82,7 +82,9 @@ test('it returns array of all feature names', function () {
         ->and($names)->toContain('test-feature')
         ->and($names)->toContain('another-feature')
         ->and($names)->toContain('interface-feature')
-        ->and($names)->toHaveCount(3);
+        ->and($names)->toContain('attribute-feature')
+        ->and($names)->toContain('mixed-feature')
+        ->and($names)->toHaveCount(5);
 });
 
 test('it discovers features implementing the Feature interface', function () {
