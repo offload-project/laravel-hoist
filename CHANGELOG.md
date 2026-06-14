@@ -1,5 +1,11 @@
 # Changelog
 
+
+## v1.4.0 - 2026-06-14
+
+### Added
+- Laravel boost skill [#13](https://github.com/offload-project/laravel-hoist/pull/13)
+
 ## v1.3.1 - 2026-06-14
 
 ### Documentation
