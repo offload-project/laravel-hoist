@@ -1,10 +1,10 @@
-<p align="center">
-    <a href="https://packagist.org/packages/offload-project/laravel-hoist"><img src="https://img.shields.io/packagist/v/offload-project/laravel-hoist.svg?style=flat-square" alt="Latest Version on Packagist"></a>
-    <a href="https://github.com/offload-project/laravel-hoist/actions"><img src="https://img.shields.io/github/actions/workflow/status/offload-project/laravel-hoist/tests.yml?branch=main&style=flat-square" alt="GitHub Tests Action Status"></a>
-    <a href="https://packagist.org/packages/offload-project/laravel-hoist"><img src="https://img.shields.io/packagist/dt/offload-project/laravel-hoist.svg?style=flat-square" alt="Total Downloads"></a>
-</p>
-
 # Laravel Hoist
+
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/offload-project/laravel-hoist.svg?style=flat-square)](https://packagist.org/packages/offload-project/laravel-hoist)
+[![Tests](https://img.shields.io/github/actions/workflow/status/offload-project/laravel-hoist/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/offload-project/laravel-hoist/actions/workflows/tests.yml)
+[![Build](https://img.shields.io/github/actions/workflow/status/offload-project/laravel-hoist/release.yml?label=build&style=flat-square)](https://github.com/offload-project/laravel-hoist/actions/workflows/release.yml)
+[![Total Downloads](https://img.shields.io/packagist/dt/offload-project/laravel-hoist.svg?style=flat-square)](https://packagist.org/packages/offload-project/laravel-hoist)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE.md)
 
 Feature discovery and management extension for Laravel Pennant. Automatically discover, manage, and serve feature flags
 with custom metadata, tags, and routing.
@@ -18,7 +18,8 @@ with custom metadata, tags, and routing.
 - **Tag-based filtering** — Filter features by single tag, ALL tags (AND), or ANY tag (OR)
 - **Feature sets** — Group related features under a named set
 - **Route integration** — Generate an `href` from a named route, safely handling missing routes
-- **Pennant compatible** — Works alongside Pennant's native `Feature::active()`, `@feature` Blade directive, and middleware
+- **Pennant compatible** — Works alongside Pennant's native `Feature::active()`, `@feature` Blade directive, and
+  middleware
 - **Customizable stubs** — Publish and customize the `hoist:feature` generator template
 
 ## Table of Contents
@@ -187,13 +188,13 @@ $paidFeatures = Hoist::withAnyTagsFor(['pro', 'enterprise'], $user);
 PHP attributes provide a clean, declarative way to define feature metadata directly on the class. All attributes are
 optional and target the class level.
 
-| Attribute               | Parameter                       | Description                                     |
-|-------------------------|---------------------------------|-------------------------------------------------|
-| `#[Label('...')]`       | `string $value`                 | Human-readable display name                     |
-| `#[Description('...')]` | `string $value`                 | Feature description                             |
-| `#[Route('...')]`       | `string $value`                 | Named route for generating the feature's `href` |
-| `#[Tags('...')]`        | `string ...$tags`               | One or more tags for categorization             |
-| `#[FeatureSet('...')]`  | `string $name, ?string $label`  | Group features into a named set                 |
+| Attribute               | Parameter                      | Description                                     |
+|-------------------------|--------------------------------|-------------------------------------------------|
+| `#[Label('...')]`       | `string $value`                | Human-readable display name                     |
+| `#[Description('...')]` | `string $value`                | Feature description                             |
+| `#[Route('...')]`       | `string $value`                | Named route for generating the feature's `href` |
+| `#[Tags('...')]`        | `string ...$tags`              | One or more tags for categorization             |
+| `#[FeatureSet('...')]`  | `string $name, ?string $label` | Group features into a named set                 |
 
 When an attribute is present, it takes precedence over the equivalent class property. You can mix both approaches — for
 example, use attributes for static metadata and properties for values that need to be computed.
@@ -220,18 +221,18 @@ class MyFeature implements Feature
 
 The `FeatureDiscovery` service (accessed via the `Hoist` facade) provides several methods for working with features:
 
-| Method                          | Returns                                            |
-|---------------------------------|----------------------------------------------------|
-| `Hoist::discover()`             | Collection of discovered feature class names       |
-| `Hoist::all()`                  | Collection of `FeatureData` without active status  |
-| `Hoist::forModel($model)`       | Collection of `FeatureData` with active status     |
-| `Hoist::names()`                | Array of all feature names                         |
-| `Hoist::tagged($tag)`           | Features with the given tag                        |
-| `Hoist::withTags([...])`        | Features with ALL given tags (AND)                 |
-| `Hoist::withAnyTags([...])`     | Features with ANY of the given tags (OR)           |
-| `Hoist::taggedFor($tag, $m)`    | Tagged features with active status for `$m`       |
-| `Hoist::withTagsFor([...], $m)` | All-tags features with active status for `$m`     |
-| `Hoist::withAnyTagsFor([...], $m)` | Any-tags features with active status for `$m` |
+| Method                             | Returns                                           |
+|------------------------------------|---------------------------------------------------|
+| `Hoist::discover()`                | Collection of discovered feature class names      |
+| `Hoist::all()`                     | Collection of `FeatureData` without active status |
+| `Hoist::forModel($model)`          | Collection of `FeatureData` with active status    |
+| `Hoist::names()`                   | Array of all feature names                        |
+| `Hoist::tagged($tag)`              | Features with the given tag                       |
+| `Hoist::withTags([...])`           | Features with ALL given tags (AND)                |
+| `Hoist::withAnyTags([...])`        | Features with ANY of the given tags (OR)          |
+| `Hoist::taggedFor($tag, $m)`       | Tagged features with active status for `$m`       |
+| `Hoist::withTagsFor([...], $m)`    | All-tags features with active status for `$m`     |
+| `Hoist::withAnyTagsFor([...], $m)` | Any-tags features with active status for `$m`     |
 
 ## Feature Data Structure
 
@@ -450,7 +451,8 @@ public function metadata(): array
 
 ## AI Coding Assistant Skill
 
-This package ships a [Laravel Boost](https://skills.laravel.cloud/) skill so coding assistants (Claude Code, Cursor, etc.) follow the package's conventions when generating code. Install it in your app with:
+This package ships a [Laravel Boost](https://skills.laravel.cloud/) skill so coding assistants (Claude Code, Cursor,
+etc.) follow the package's conventions when generating code. Install it in your app with:
 
 ```bash
 php artisan boost:add-skill offload-project/laravel-hoist
