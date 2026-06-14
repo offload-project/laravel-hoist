@@ -7,7 +7,40 @@
 # Laravel Hoist
 
 Feature discovery and management extension for Laravel Pennant. Automatically discover, manage, and serve feature flags
-with custom metadata and routing.
+with custom metadata, tags, and routing.
+
+## Features
+
+- **Automatic discovery** — Drop a class into your `Features` directory; it's picked up without manual registration
+- **PHP attributes** — Declarative metadata via `#[Label]`, `#[Description]`, `#[Route]`, `#[Tags]`, `#[FeatureSet]`
+- **Rich `FeatureData` payload** — Structured DTO with label, description, href, active status, tags, and metadata
+- **Per-user resolution** — `Hoist::forModel($user)` returns every feature with its active status for that scope
+- **Tag-based filtering** — Filter features by single tag, ALL tags (AND), or ANY tag (OR)
+- **Feature sets** — Group related features under a named set
+- **Route integration** — Generate an `href` from a named route, safely handling missing routes
+- **Pennant compatible** — Works alongside Pennant's native `Feature::active()`, `@feature` Blade directive, and middleware
+- **Customizable stubs** — Publish and customize the `hoist:feature` generator template
+
+## Table of Contents
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Quick Start](#quick-start)
+    - [Create a Feature](#1-create-a-feature)
+    - [Use Features](#2-use-features)
+    - [Filter by Tags](#3-filter-by-tags)
+- [Attributes](#attributes)
+- [Feature Discovery Service](#feature-discovery-service)
+- [Feature Data Structure](#feature-data-structure)
+- [Integration with Laravel Pennant](#integration-with-laravel-pennant)
+- [Use Cases](#use-cases)
+- [Advanced Usage](#advanced-usage)
+- [AI Coding Assistant Skill](#ai-coding-assistant-skill)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [Security](#security)
+- [License](#license)
 
 ## Requirements
 
@@ -48,21 +81,15 @@ Optionally, publish the stub files for customization:
 php artisan vendor:publish --tag=hoist-stubs
 ```
 
-## Features
+## Quick Start
 
-### Feature Discovery
-
-Automatically discover and manage Laravel Pennant features with custom metadata and routing information.
-
-#### Create a Feature
+### 1. Create a Feature
 
 ```bash
-php artisan hoist:feature NewFeature
+php artisan hoist:feature BillingFeature
 ```
 
-This will create a new feature class in your configured feature directory (default: `app/Features`).
-
-#### Feature Class Example
+This creates a new feature class in your configured feature directory (default: `app/Features`).
 
 Features can define metadata using **PHP attributes** (recommended) or **class properties**. Attributes take precedence
 over properties when both are present.
@@ -109,41 +136,7 @@ class BillingFeature implements Feature
 > **Note:** The `Feature` interface is optional but recommended. Features are discovered based on having a `resolve()`
 > method, but implementing the interface provides better IDE support and type safety.
 
-### Attributes
-
-PHP attributes provide a clean, declarative way to define feature metadata directly on the class. All attributes are
-optional and target the class level.
-
-| Attribute | Parameter | Description |
-|---|---|---|
-| `#[Label('...')]` | `string $value` | Human-readable display name |
-| `#[Description('...')]` | `string $value` | Feature description |
-| `#[Route('...')]` | `string $value` | Named route for generating the feature's `href` |
-| `#[Tags('...')]` | `string ...$tags` | One or more tags for categorization |
-| `#[FeatureSet('...')]` | `string $name, ?string $label` | Group features into a named set |
-
-When an attribute is present, it takes precedence over the equivalent class property. You can mix both approaches — for
-example, use attributes for static metadata and properties for values that need to be computed.
-
-```php
-// Properties-only approach (still supported)
-class MyFeature implements Feature
-{
-    public string $name = 'my-feature';
-    public string $label = 'My Feature';
-    public ?string $description = 'A description';
-    public ?string $route = 'my-feature.index';
-    public array $tags = ['flag'];
-    public string $featureSet = 'core';
-
-    public function resolve(mixed $scope): mixed
-    {
-        return true;
-    }
-}
-```
-
-#### Using Features
+### 2. Use Features
 
 ```php
 use OffloadProject\Hoist\Facades\Hoist;
@@ -170,78 +163,7 @@ foreach ($userFeatures as $feature) {
 }
 ```
 
-### Feature Discovery Service
-
-The `FeatureDiscovery` service provides several methods for working with features:
-
-#### discover()
-
-Discovers all feature classes from configured directories.
-
-```php
-use OffloadProject\Hoist\Services\FeatureDiscovery;
-
-$discovery = app(FeatureDiscovery::class);
-$featureClasses = $discovery->discover();
-// Returns: Collection of feature class names
-```
-
-#### all()
-
-Returns all features as `FeatureData` objects without checking active status.
-
-```php
-$features = Hoist::all();
-// Returns: Collection of FeatureData objects
-```
-
-#### forModel($model)
-
-Returns all features with their active status for a specific model (typically a User).
-
-```php
-$userFeatures = Hoist::forModel($user);
-// Each FeatureData object includes 'active' property
-```
-
-#### names()
-
-Returns an array of all feature names.
-
-```php
-$names = Hoist::names();
-// Returns: ['feature-one', 'feature-two', ...]
-```
-
-### Feature Tags
-
-Tags provide a flexible way to categorize features for filtering. Use tags to separate feature flags from subscription
-features, or to group features by plan tier.
-
-#### Define Tags
-
-```php
-use OffloadProject\Hoist\Attributes\Label;
-use OffloadProject\Hoist\Attributes\Tags;
-
-#[Label('Dark Mode')]
-#[Tags('flag', 'ui')]
-class DarkMode implements Feature
-{
-    public string $name = 'dark-mode';
-    // ...
-}
-
-#[Label('Advanced Reporting')]
-#[Tags('subscription', 'pro', 'enterprise')]
-class AdvancedReporting implements Feature
-{
-    public string $name = 'advanced-reporting';
-    // ...
-}
-```
-
-#### Filter by Tags
+### 3. Filter by Tags
 
 ```php
 // Get features with a specific tag
@@ -253,24 +175,65 @@ $proSubscriptions = Hoist::withTags(['subscription', 'pro']);
 
 // Get features with ANY of the specified tags (OR logic)
 $paidFeatures = Hoist::withAnyTags(['pro', 'enterprise']);
-```
 
-#### Filter with Model Scope
-
-Include active status when filtering by tags:
-
-```php
-// Get subscription features for a user with active status
+// Filter with model scope (includes active status)
 $features = Hoist::taggedFor('subscription', $user);
-
-// Get pro features for a user
 $proFeatures = Hoist::withTagsFor(['subscription', 'pro'], $user);
-
-// Get any paid tier features for a user
 $paidFeatures = Hoist::withAnyTagsFor(['pro', 'enterprise'], $user);
 ```
 
-### Feature Data Structure
+## Attributes
+
+PHP attributes provide a clean, declarative way to define feature metadata directly on the class. All attributes are
+optional and target the class level.
+
+| Attribute               | Parameter                       | Description                                     |
+|-------------------------|---------------------------------|-------------------------------------------------|
+| `#[Label('...')]`       | `string $value`                 | Human-readable display name                     |
+| `#[Description('...')]` | `string $value`                 | Feature description                             |
+| `#[Route('...')]`       | `string $value`                 | Named route for generating the feature's `href` |
+| `#[Tags('...')]`        | `string ...$tags`               | One or more tags for categorization             |
+| `#[FeatureSet('...')]`  | `string $name, ?string $label`  | Group features into a named set                 |
+
+When an attribute is present, it takes precedence over the equivalent class property. You can mix both approaches — for
+example, use attributes for static metadata and properties for values that need to be computed.
+
+```php
+// Properties-only approach (still supported)
+class MyFeature implements Feature
+{
+    public string $name = 'my-feature';
+    public string $label = 'My Feature';
+    public ?string $description = 'A description';
+    public ?string $route = 'my-feature.index';
+    public array $tags = ['flag'];
+    public string $featureSet = 'core';
+
+    public function resolve(mixed $scope): mixed
+    {
+        return true;
+    }
+}
+```
+
+## Feature Discovery Service
+
+The `FeatureDiscovery` service (accessed via the `Hoist` facade) provides several methods for working with features:
+
+| Method                          | Returns                                            |
+|---------------------------------|----------------------------------------------------|
+| `Hoist::discover()`             | Collection of discovered feature class names       |
+| `Hoist::all()`                  | Collection of `FeatureData` without active status  |
+| `Hoist::forModel($model)`       | Collection of `FeatureData` with active status     |
+| `Hoist::names()`                | Array of all feature names                         |
+| `Hoist::tagged($tag)`           | Features with the given tag                        |
+| `Hoist::withTags([...])`        | Features with ALL given tags (AND)                 |
+| `Hoist::withAnyTags([...])`     | Features with ANY of the given tags (OR)           |
+| `Hoist::taggedFor($tag, $m)`    | Tagged features with active status for `$m`       |
+| `Hoist::withTagsFor([...], $m)` | All-tags features with active status for `$m`     |
+| `Hoist::withAnyTagsFor([...], $m)` | Any-tags features with active status for `$m` |
+
+## Feature Data Structure
 
 The `FeatureData` class provides a structured way to access feature information:
 
@@ -292,12 +255,12 @@ class FeatureData
 
 This package extends Laravel Pennant by providing:
 
-1. **Automatic Discovery**: No need to manually register features
-2. **PHP Attributes**: Declarative metadata using native PHP attributes
-3. **Rich Metadata**: Add custom metadata to features
-4. **Route Integration**: Link features to routes automatically
-5. **Structured Data**: Get features as structured data objects
-6. **Bulk Operations**: Get all features and their status in one call
+1. **Automatic Discovery** — No need to manually register features
+2. **PHP Attributes** — Declarative metadata using native PHP attributes
+3. **Rich Metadata** — Add custom metadata to features
+4. **Route Integration** — Link features to routes automatically
+5. **Structured Data** — Get features as structured data objects
+6. **Bulk Operations** — Get all features and their status in one call
 
 ### Using with Pennant's Native Features
 
@@ -316,7 +279,7 @@ if (Feature::active('billing')) {
     <!-- Feature content -->
 @endfeature
 
-// Combined with Pennant Hoist
+// Combined with Hoist
 $features = Hoist::forModel($user);
 foreach ($features as $feature) {
     if ($feature->active) {
@@ -454,46 +417,9 @@ The `href` property in `FeatureData` is generated from the feature's route value
 - If the route name doesn't exist, `href` will be `null` (no exception thrown)
 - If the route name is valid, `href` will contain the generated URL
 
-```php
-use OffloadProject\Hoist\Attributes\Route;
-
-#[Route('dashboard.index')]
-class MyFeature implements Feature
-{
-    public string $name = 'my-feature';
-
-    // ...
-}
-```
-
 ### The Feature Interface
 
-The package provides an optional `Feature` interface for better type safety:
-
-```php
-use OffloadProject\Hoist\Attributes\Description;
-use OffloadProject\Hoist\Attributes\Label;
-use OffloadProject\Hoist\Contracts\Feature;
-
-#[Label('My Feature')]
-#[Description('A description')]
-class MyFeature implements Feature
-{
-    public string $name = 'my-feature';
-
-    public function resolve(mixed $scope): mixed
-    {
-        return true;
-    }
-
-    public function metadata(): array
-    {
-        return [];
-    }
-}
-```
-
-Features are discovered if they either:
+The package provides an optional `Feature` interface for better type safety. Features are discovered if they either:
 
 1. Implement the `Feature` interface, OR
 2. Have a `resolve()` method (for backward compatibility with plain Pennant features)
@@ -502,11 +428,11 @@ Features are discovered if they either:
 
 Use metadata for:
 
-- **Categorization**: Group features by category
-- **UI Elements**: Icons, colors, badges
-- **Permissions**: Access levels, roles
-- **Versioning**: Track feature versions
-- **Analytics**: Track feature usage
+- **Categorization** — Group features by category
+- **UI Elements** — Icons, colors, badges
+- **Permissions** — Access levels, roles
+- **Versioning** — Track feature versions
+- **Analytics** — Track feature usage
 
 ```php
 public function metadata(): array
@@ -522,12 +448,33 @@ public function metadata(): array
 }
 ```
 
+## AI Coding Assistant Skill
+
+This package ships a [Laravel Boost](https://skills.laravel.cloud/) skill so coding assistants (Claude Code, Cursor, etc.) follow the package's conventions when generating code. Install it in your app with:
+
+```bash
+php artisan boost:add-skill offload-project/laravel-hoist
+```
+
+The skill source lives at [`skills/SKILL.md`](skills/SKILL.md).
+
 ## Testing
 
 ```bash
-./vendor/bin/pest
+composer test
 ```
+
+## Contributing
+
+Contributions are welcome! Please see the documents below before getting started.
+
+- [Contributing Guide](CONTRIBUTING.md) — setup, workflow, commit conventions, and PR process
+- [Code of Conduct](CODE_OF_CONDUCT.md) — expectations for participation in this project
+
+## Security
+
+- [Security Policy](SECURITY.md) — how to report a vulnerability privately
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE) for more information.
+The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
