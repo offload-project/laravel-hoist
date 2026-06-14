@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.3.1 - 2026-06-14
+
+### Documentation
+- Update, add missing docs [#11](https://github.com/offload-project/laravel-hoist/pull/11)
+
 ## v1.3.0 - 2026-03-31
 
 ### Added
